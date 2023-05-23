@@ -11,13 +11,13 @@ export class MarketplaceService {
   ) { }
 
   productos(){
-    return this.http.get<any>(
+    return this.http.get(
       `https://fakeapi.platzi.com/en/rest/products`
     );
   }
 
   docs(){
-    return this.http.get<any>(
+    return this.http.get(
       `https://fakestoreapi.com/docs`
     );
   }
