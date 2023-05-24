@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MarketplaceService} from './services/marketplace.service';
-import {HttpClient} from '@angular/common/http';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-root',
@@ -15,11 +15,14 @@ export class AppComponent implements OnInit {
    * @date 23/08/2023
    */
   productos = [
-    { id: 1, nombre: 'Producto 1', precio: '$250.000', descripcion: 'Descripción 1', url: '/assets/images/img1.png'},
-    { id: 2,nombre: 'Producto 2', precio: '$480.000', descripcion: 'Descripción 2', url: '/assets/images/img2.png'},
-    { id: 3,nombre: 'Producto 3', precio: '$500.000', descripcion: 'Descripción 3', url: '/assets/images/img3.png'},
+    { id: 1, nombre: 'Producto 1', precio: '$250.000', descripcion: 'Descripción 1', url: '/assets/images/img1.png', selected: false},
+    { id: 2,nombre: 'Producto 2', precio: '$480.000', descripcion: 'Descripción 2', url: '/assets/images/img2.png', selected: false},
+    { id: 3,nombre: 'Producto 3', precio: '$500.000', descripcion: 'Descripción 3', url: '/assets/images/img3.png', selected: false},
   ];
   listaCarrito: any[] = [];
+  productoRepetido: any;
+  cantProductos: any;
+
   constructor(
     private service: MarketplaceService,
   ) { }
@@ -27,7 +30,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.listarProductos();
     this.listarDocs();
-    console.log(this.listaCarrito);
   }
 
   /**
@@ -61,7 +63,13 @@ export class AppComponent implements OnInit {
    * @date 23/08/2023
    */
   agregarProducto(prod: any) {
-    this.listaCarrito.push(prod);
+    const index = this.listaCarrito.findIndex(producto => producto.id === prod.id);
+    if (index !== -1) {
+      // Está agregando un producto repetido, sumar cantidad
+    } else {
+      this.listaCarrito.push(prod);
+    }
+    this.cantProductos = this.listaCarrito.length;
   }
 
   /**
@@ -76,5 +84,44 @@ export class AppComponent implements OnInit {
     if (index !== -1) {
       this.listaCarrito.splice(index, 1);
     }
+    this.cantProductos = this.listaCarrito.length;
+  }
+
+  exportSelectedProducts(format: string): void {
+    // Filtrar los productos seleccionados
+    const selectedProducts = this.productos.filter(product => product.selected);
+
+    // Convertir los productos en un arreglo de datos compatible con el formato seleccionado
+    let exportData: any[] = [];
+    selectedProducts.forEach(product => {
+      exportData.push([product.id, product.nombre, product.precio, product.descripcion]);
+    });
+
+    // Crear el nombre del archivo de acuerdo al formato seleccionado
+    const fileName = `listaProductos.${format}`;
+
+    // Exportar los datos al formato seleccionado
+    if (format === 'xls' || format === 'xlsx') {
+      const worksheet = XLSX.utils.aoa_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
+      const excelData = XLSX.write(workbook, { bookType: format, type: 'array' });
+      this.downloadFile(excelData, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    }
+  }
+
+  downloadFile(data: any, fileName: string, fileType: string): void {
+    const blob = new Blob([data], { type: fileType });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  validarCheck(index: any) {
+    this.productos[index].selected = true;
+    console.log(this.productos);
   }
 }

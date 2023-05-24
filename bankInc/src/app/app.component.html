@@ -22,7 +22,8 @@
   </div>
   <div class="w3-bar-block">
     <a href="#productos" class="w3-bar-item w3-button w3-hover-white">Productos</a>
-    <a href="#carrito" class="w3-bar-item w3-button w3-hover-white">Carrito de compras</a>
+    <a href="#carrito" class="w3-bar-item w3-button w3-hover-white">Carrito de compras ({{cantProductos}} productos)</a>
+    <a (click)="exportSelectedProducts('xls')" class="w3-bar-item w3-button w3-hover-white">Exportar a xls</a>
   </div>
 </nav>
 
@@ -38,7 +39,7 @@
   <!-- Lista de productos -->
   <div class="w3-row-padding w3-grayscale">
     <div class="w3-row m6 w3-margin">
-      <div class="w3-light-grey" *ngFor="let prod of productos">
+      <div class="w3-light-grey" *ngFor="let prod of productos; let i = index">
         <img src="{{prod.url}}" alt="John" style="width:100%">
         <div class="w3-container">
           <ul class="w3-ul w3-light-grey w3-center">
@@ -49,6 +50,9 @@
             </li>
             <li class="w3-light-grey w3-padding-24">
               <button class="w3-button w3-white w3-padding-large w3-hover-black" (click)="agregarProducto(prod)">Añadir al carrito</button>
+              <button class="w3-button w3-white w3-padding-large w3-hover-black" (click)="agregarProducto(prod)">
+                <input type="checkbox" (change)="validarCheck(i)">Exportar a xls
+              </button>
             </li>
           </ul>
         </div>
@@ -60,7 +64,7 @@
   <div class="w3-container" id="carrito" style="margin-top:75px">
     <h1 class="w3-xxxlarge w3-text-red"><b>Carrito de compras.</b></h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
-    <p>Aquí puedes ver los productos que has agregado al carrito</p>
+    <p>Aquí puedes ver los productos que has agregado al carrito.</p>
   </div>
 
   <div class="w3-row-padding">
