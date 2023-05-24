@@ -87,7 +87,13 @@ export class AppComponent implements OnInit {
     this.cantProductos = this.listaCarrito.length;
   }
 
-  exportSelectedProducts(format: string): void {
+  /**
+   * @method Descargar productos seleccionados a excel
+   * @author Leidy Caterine Santos Alvarez - <leidysantos103@gmail.com>
+   * @generalDescription De acueerdo con los productos seleccionados, se ecporta la información a excel
+   * @date 23/08/2023
+   */
+  exportar(formato: string): void {
     // Filtrar los productos seleccionados
     const selectedProducts = this.productos.filter(product => product.selected);
 
@@ -98,17 +104,18 @@ export class AppComponent implements OnInit {
     });
 
     // Crear el nombre del archivo de acuerdo al formato seleccionado
-    const fileName = `listaProductos.${format}`;
+    const fileName = `listaProductos.${formato}`;
 
     // Exportar los datos al formato seleccionado
-    if (format === 'xls' || format === 'xlsx') {
+    if (formato === 'xls' || formato === 'xlsx') {
       const worksheet = XLSX.utils.aoa_to_sheet(exportData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
-      const excelData = XLSX.write(workbook, { bookType: format, type: 'array' });
+      const excelData = XLSX.write(workbook, { bookType: formato, type: 'array' });
       this.downloadFile(excelData, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
   }
+
 
   downloadFile(data: any, fileName: string, fileType: string): void {
     const blob = new Blob([data], { type: fileType });
@@ -122,6 +129,5 @@ export class AppComponent implements OnInit {
 
   validarCheck(index: any) {
     this.productos[index].selected = true;
-    console.log(this.productos);
   }
 }
